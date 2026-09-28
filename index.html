@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FDE Mission — Forward Deployed Engineer Playground</title>
+<style>
+:root{--bg:#09101d;--panel:#111a2b;--card:#172238;--line:#2a3954;--text:#f4f7fb;--muted:#9dacbf;--accent:#7c9cff;--good:#54d39b;--warn:#ffcc66}
+*{box-sizing:border-box} body{margin:0;font:16px/1.5 Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:radial-gradient(circle at top,#17233b 0,#09101d 48%);color:var(--text);min-height:100vh}
+.wrap{max-width:1180px;margin:auto;padding:32px 20px 60px}.hero{display:flex;justify-content:space-between;gap:24px;align-items:end;margin-bottom:26px}.eyebrow{color:var(--accent);font-weight:800;letter-spacing:.12em;font-size:12px}.hero h1{font-size:clamp(30px,5vw,54px);line-height:1.02;margin:7px 0 10px}.hero p{color:var(--muted);max-width:720px;margin:0}.badge{border:1px solid var(--line);background:#101a2d;padding:9px 13px;border-radius:999px;white-space:nowrap}
+.grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.7fr);gap:18px}.panel{background:rgba(17,26,43,.92);border:1px solid var(--line);border-radius:18px}.stageHead{display:flex;gap:14px;padding:20px;border-bottom:1px solid var(--line)}.icon{width:48px;height:48px;border-radius:14px;background:var(--card);display:grid;place-items:center;font-size:25px}.stageHead h2{margin:0;font-size:21px}.sub{color:var(--muted);font-size:14px}.body{padding:20px}.quote{background:var(--card);padding:15px;border-radius:13px;margin-bottom:18px}.quote small{display:block;color:var(--muted);font-weight:700;margin-bottom:4px}.question{font-size:18px;font-weight:800;margin-bottom:12px}.choices{display:grid;gap:10px}.choice{width:100%;text-align:left;background:#101a2b;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;font-size:15px;transition:.18s}.choice:hover{border-color:#6988e6;transform:translateY(-1px)}.choice:disabled{cursor:default;transform:none}.choice.selected{background:#1d2d52;border-color:var(--accent)}.feedback{margin-top:14px;border:1px solid var(--line);background:#0e1727;padding:14px;border-radius:12px}.actions{display:flex;gap:10px;margin-top:17px;flex-wrap:wrap}button.primary,button.secondary{border-radius:11px;padding:12px 17px;font-weight:800;cursor:pointer}button.primary{border:0;background:var(--accent);color:#08101f}button.primary:disabled{opacity:.35;cursor:not-allowed}button.secondary{background:transparent;color:var(--text);border:1px solid var(--line)}
+.side{display:grid;gap:18px;align-content:start}.side .panel{padding:18px}.side h3{margin:0 0 14px}.meter{margin:13px 0}.meterLabel{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px}.track{height:8px;background:#23304a;border-radius:99px;overflow:hidden}.fill{height:100%;background:var(--good);transition:width .3s}.unlocks{display:grid;gap:9px;color:var(--muted);font-size:14px}.unlocks .on{color:var(--text)}.flow{margin-top:18px;padding:18px}.flow h3{margin:0 0 13px}.steps{display:flex;align-items:center;gap:7px;overflow:auto;padding-bottom:4px}.step{border:1px solid var(--line);border-radius:9px;padding:9px 11px;white-space:nowrap;font-size:13px}.step.active{background:#24365e;border-color:var(--accent)}.step.done{background:#18382e;border-color:#376c58}.arrow{color:var(--muted)}.result{padding:8px 0}.score{font-size:54px;font-weight:900;letter-spacing:-.04em}.lesson{font-size:17px;background:var(--card);padding:18px;border-radius:14px;margin-top:15px}.rolegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}.role{background:#101a2b;border:1px solid var(--line);padding:12px;border-radius:11px;font-size:13px}.role b{display:block;margin-bottom:4px}.footer{text-align:center;color:var(--muted);font-size:13px;margin-top:22px}
+@media(max-width:800px){.grid{grid-template-columns:1fr}.hero{align-items:start;flex-direction:column}.rolegrid{grid-template-columns:1fr}.wrap{padding-top:22px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header class="hero"><div><div class="eyebrow">INTERACTIVE ROLE PLAY</div><h1>FDE Mission</h1><p>You are a Forward Deployed Engineer dropped into a real customer problem. Make decisions, ship the solution, and learn what an FDE actually does along the way.</p></div><div id="stageBadge" class="badge">Stage 1 / 6</div></header>
+<div class="grid">
+<section class="panel">
+ <div class="stageHead"><div id="icon" class="icon">🔎</div><div><h2 id="name"></h2><div id="role" class="sub"></div></div></div>
+ <div class="body">
+  <div class="quote"><small>CUSTOMER SAYS</small><span id="quote"></span></div>
+  <div id="question" class="question"></div><div id="choices" class="choices"></div>
+  <div id="feedback" class="feedback" hidden></div>
+  <div class="actions"><button id="next" class="primary" disabled>Continue →</button><button id="restart" class="secondary">Restart mission</button></div>
+ </div>
+</section>
+<aside class="side">
+ <section class="panel"><h3>Mission health</h3>
+  <div class="meter"><div class="meterLabel"><span>Customer trust</span><b id="trustN">50</b></div><div class="track"><div id="trustB" class="fill" style="width:50%"></div></div></div>
+  <div class="meter"><div class="meterLabel"><span>Technical fit</span><b id="techN">50</b></div><div class="track"><div id="techB" class="fill" style="width:50%"></div></div></div>
+  <div class="meter"><div class="meterLabel"><span>Production readiness</span><b id="prodN">20</b></div><div class="track"><div id="prodB" class="fill" style="width:20%"></div></div></div>
+ </section>
+ <section class="panel"><h3>FDE skills unlocked</h3><div id="unlocks" class="unlocks"></div></section>
+</aside>
+</div>
+<section class="panel flow"><h3>The FDE journey</h3><div id="flow" class="steps"></div></section>
+<div class="footer">Scenario: AcmePay • Goal: reduce incident investigation from 45 minutes to under 10 minutes</div>
+</main>
+<script>
+const stages=[
+{icon:"🔎",name:"1. Customer Discovery",role:"Understand the real problem before writing code.",quote:"“We need an AI agent for incidents. Can you build one?”",q:"What do you do first?",unlock:"Problem discovery",opts:[
+["Open your IDE and start building a generic incident agent.",[-5,5,0],"Fast, but premature. You still don't know the workflow, constraints, or success criteria."],
+["Interview SREs, map the workflow, systems, pain points and success metric.",[15,10,0],"Exactly. The vague request becomes a measurable problem: reduce investigation time from 45 minutes to under 10."],
+["Send product documentation and ask the customer to configure it.",[-10,0,0],"That is closer to support. An FDE gets close to the customer's problem and implementation."]]},
+{icon:"🏢",name:"2. Embed in Their Environment",role:"Work inside the customer's actual technical and organizational constraints.",quote:"“Logs are in Datadog, incidents in Jira, ownership is elsewhere, and security says data cannot leave our VPC.”",q:"Choose your next move.",unlock:"Customer environment",opts:[
+["Ask AcmePay to migrate everything to your preferred stack.",[-15,-10,0],"FDEs adapt to real environments rather than requiring a perfect greenfield stack."],
+["Work with security and platform teams and design an in-VPC integration.",[15,15,5],"Good. You're now solving architecture, security, APIs and organizational constraints with the customer."],
+["Ignore security for the demo and solve it later.",[-20,0,-10],"A demo that can never cross the customer's security boundary is unlikely to become production software."]]},
+{icon:"🛠️",name:"3. Prototype Fast",role:"Turn the problem into working software quickly.",quote:"“Can you show us something working this week?”",q:"What should the prototype prove?",unlock:"Hands-on prototyping",opts:[
+["Build a polished generic dashboard with lots of features.",[0,5,0],"It may look impressive, but it doesn't validate the highest-value customer workflow."],
+["Build a thin slice: incident → context → logs → deployment → likely cause.",[10,20,10],"Strong move. A narrow end-to-end workflow proves value quickly and exposes integration problems early."],
+["Wait for the core product team to add every requested feature.",[-10,-5,-5],"Forward deployment often exists because the customer cannot wait for the normal roadmap."]]},
+{icon:"🔌",name:"4. Integrate Real Systems",role:"Connect APIs, data, identity and customer-specific workflows.",quote:"“The demo works. Now make it work with our real services and permissions.”",q:"What changes now?",unlock:"Systems integration",opts:[
+["Keep using mock data because the demo proved the idea.",[-5,-10,-10],"Mock data proves a concept, not a deployment. Real systems expose permissions, schemas, latency and reliability issues."],
+["Implement real connectors, auth, service mappings, permissions and error handling.",[10,20,20],"Yes. This is where software engineering and deep customer context come together."],
+["Hand the prototype to the customer and leave.",[-15,-5,-10],"Too early. The hardest gap is often between an impressive prototype and a dependable workflow."]]},
+{icon:"🚀",name:"5. Productionize",role:"Make the solution reliable, secure, observable and maintainable.",quote:"“Great. Can 200 engineers depend on this during a Sev-1?”",q:"Your priority?",unlock:"Production engineering",opts:[
+["Add monitoring, tests, guardrails, fallbacks, access controls and rollout gates.",[10,15,30],"Correct. The FDE doesn't stop at 'it works on my laptop.' It has to survive real users and failures."],
+["Add three more AI features before launch.",[0,5,-10],"More capability isn't the same as production readiness. Reliability matters more now."],
+["Launch to everyone immediately.",[-10,0,-20],"A staged rollout is safer for a workflow involved in production incidents."]]},
+{icon:"🔁",name:"6. Close the Product Loop",role:"Turn one deployment into reusable product learning.",quote:"“This ownership-context problem probably exists for every enterprise customer.”",q:"What does a strong FDE do?",unlock:"Product feedback loop",opts:[
+["Keep all custom work permanently inside AcmePay.",[0,0,0],"Some customization stays local, but reusable lessons should reach the product organization."],
+["Document the pattern, measure impact, and feed reusable capabilities back to product engineering.",[15,15,15],"Exactly. FDEs are a two-way bridge: product → customer and customer reality → product."],
+["Move to the next customer without documenting anything.",[-10,-5,0],"That loses one of the highest-leverage parts of forward deployment: field learning."]]}
+];
+const labels=["Discover","Embed","Prototype","Integrate","Productionize","Feedback"];
+let idx=0,score={trust:50,tech:50,prod:20},answered=false,unlocked=[];
+const el=id=>document.getElementById(id), clamp=n=>Math.max(0,Math.min(100,n));
+function meters(){for(const [k,n,b] of [["trust","trustN","trustB"],["tech","techN","techB"],["prod","prodN","prodB"]]){el(n).textContent=score[k];el(b).style.width=score[k]+"%"}}
+function side(){el("unlocks").innerHTML=stages.map((s,i)=>`<div class="${unlocked.includes(i)?"on":""}">${unlocked.includes(i)?"✓":"🔒"} ${s.unlock}</div>`).join("");el("flow").innerHTML=labels.map((x,i)=>`<span class="step ${i===idx?"active":i<idx||unlocked.includes(i)?"done":""}">${x}</span>${i<labels.length-1?'<span class="arrow">→</span>':""}`).join("")}
+function render(){answered=false;const s=stages[idx];el("stageBadge").textContent=`Stage ${idx+1} / ${stages.length}`;el("icon").textContent=s.icon;el("name").textContent=s.name;el("role").textContent=s.role;el("quote").textContent=s.quote;el("question").textContent=s.q;el("feedback").hidden=true;el("next").disabled=true;el("next").textContent=idx===stages.length-1?"Finish mission →":"Continue →";el("choices").innerHTML="";s.opts.forEach((o,n)=>{const b=document.createElement("button");b.className="choice";b.textContent=String.fromCharCode(65+n)+". "+o[0];b.onclick=()=>choose(n,b);el("choices").appendChild(b)});side()}
+function choose(n,b){if(answered)return;answered=true;const o=stages[idx].opts[n],d=o[1];score.trust=clamp(score.trust+d[0]);score.tech=clamp(score.tech+d[1]);score.prod=clamp(score.prod+d[2]);if(!unlocked.includes(idx))unlocked.push(idx);meters();[...el("choices").children].forEach(x=>x.disabled=true);b.classList.add("selected");el("feedback").textContent=o[2];el("feedback").hidden=false;el("next").disabled=false;side()}
+function finish(){const avg=Math.round((score.trust+score.tech+score.prod)/3);el("stageBadge").textContent="Mission complete";el("icon").textContent="🏁";el("name").textContent="Deployment Complete";el("role").textContent="You turned a vague request into a production workflow and reusable product learning.";el("quote").textContent="“Incident investigation dropped from 45 minutes to 8 minutes. Let's roll this out to more teams.”";el("question").innerHTML=`<div class="result">Your FDE score <div class="score">${avg}/100</div></div>`;el("choices").innerHTML=`<div class="lesson"><b>The big idea:</b> A Forward Deployed Engineer sits at the intersection of <b>customer discovery, software engineering, integration, deployment, and product feedback.</b> They go into the customer's real environment and make the product solve a high-value problem.</div><div class="rolegrid"><div class="role"><b>Not just Sales</b>They don't stop after explaining the product.</div><div class="role"><b>Not just Consulting</b>They write and ship real software.</div><div class="role"><b>Not just Product Engineering</b>They work directly against customer reality.</div></div>`;el("feedback").hidden=true;el("next").style.display="none"}
+function reset(){idx=0;score={trust:50,tech:50,prod:20};unlocked=[];el("next").style.display="";meters();render()}
+el("next").onclick=()=>{if(!answered)return;if(idx<stages.length-1){idx++;render()}else finish()};el("restart").onclick=reset;meters();render();
+</script>
+</body></html>
